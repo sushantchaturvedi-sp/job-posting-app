@@ -6,18 +6,21 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Layout from "./components/Layout";
 
-
 function App() {
     return (
-      <Router>
-        <Routes>
-          <Route path="/" element={<Layout />}>  
-            <Route index element={<Home />} /> 
-            <Route path="about" element={<About />} />  
-            <Route path="contact" element={<Contact />} />
-          </Route>
-        </Routes>
-      </Router>
+        <Router>
+            <Routes>
+                <Route path="/" element={<Layout />}>
+                    <Route index element={<Home />} />
+                    <Route path="jobs/:id" element={<JobDetails />} />
+                    <Route path="login" element={<Login />} />
+                    <Route path="create-job" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
+                    <Route path="edit-job/:id" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
+                    <Route path="*" element={<h2>404 Not Found</h2>} />
+                </Route>
+            </Routes>
+        </Router>
     );
-  }
+}
+
 export default App;
