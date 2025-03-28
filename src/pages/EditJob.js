@@ -1,31 +1,39 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { getJobs, saveJobs, getJobById } from "../utils/storage";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 function EditJob() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const job = getJobById(id);
+    const [job, setJob] = useState({ title: "", description: "", company: "" });
 
-    const [title, setTitle] = useState(job?.title || "");
-    const [company, setCompany] = useState(job?.company || "");
-    const [description, setDescription] = useState(job?.description || "");
+    useEffect(() => {
+        const jobs = JSON.parse(sessionStorage.getItem("jobs")) || [];
+        const foundJob = jobs.find((j) => j.id === parseInt(id));
+        if (foundJob) {
+            setJob(foundJob);
+        } else {
+            alert("Job not found!");
+            navigate("/");
+        }
+    }, [id, navigate]);
 
-    if (!job) return <h2>Job Not Found</h2>;
-
-    function handleEditJob() {
-        const updatedJobs = getJobs().map(j => j.id === id ? { ...j, title, company, description } : j);
-        saveJobs(updatedJobs);
+    const handleEditJob = (e) => {
+        e.preventDefault();
+        let jobs = JSON.parse(sessionStorage.getItem("jobs")) || [];
+        jobs = jobs.map((j) => (j.id === parseInt(id) ? job : j));
+        sessionStorage.setItem("jobs", JSON.stringify(jobs));
         navigate("/");
-    }
+    };
 
     return (
         <div>
             <h2>Edit Job</h2>
-            <input placeholder="Job Title" value={title} onChange={e => setTitle(e.target.value)} />
-            <input placeholder="Company" value={company} onChange={e => setCompany(e.target.value)} />
-            <textarea placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
-            <button onClick={handleEditJob}>Save Changes</button>
+            <form onSubmit={handleEditJob}>
+                <input type="text" value={job.title} onChange={(e) => setJob({ ...job, title: e.target.value })} required />
+                <input type="text" value={job.company} onChange={(e) => setJob({ ...job, company: e.target.value })} required />
+                <textarea value={job.description} onChange={(e) => setJob({ ...job, description: e.target.value })} required />
+                <button type="submit">Save Changes</button>
+            </form>
         </div>
     );
 }

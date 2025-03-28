@@ -1,29 +1,30 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useAuthContext } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
-import { login } from "../utils/auth";
-import Navbar from "../components/Navbar";
+
 function Login() {
     const [email, setEmail] = useState("");
-    const [error, setError] = useState(null);
+    const { login } = useAuthContext();
     const navigate = useNavigate();
 
-    function handleLogin() {
+    const handleLogin = (e) => {
+        e.preventDefault();
         if (!email.includes("@")) {
-            setError("Invalid email format");
+            alert("Please enter a valid email.");
             return;
         }
         login(email);
         navigate("/");
-    }
+    };
 
     return (
-        <div><Navbar />
-            <div>
-                <h2>Login</h2>
-                {error && <p>{error}</p>}
-                <input type="email" placeholder="Enter email" value={email} onChange={e => setEmail(e.target.value)} />
-                <button onClick={handleLogin}>Login</button>
-            </div></div>
+        <div>
+            <h2>Login</h2>
+            <form onSubmit={handleLogin}>
+                <input type="email" placeholder="Enter Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <button type="submit">Login</button>
+            </form>
+        </div>
     );
 }
 

@@ -1,25 +1,43 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./context/authContext";
+import ProtectedRoute from "./routes/ProtectedRoute";
 import Home from "./pages/Home";
 import JobDetails from "./pages/JobDetails";
 import CreateJob from "./pages/CreateJob";
+import EditJob from "./pages/EditJob";
 import Login from "./pages/Login";
-import ProtectedRoute from "./routes/ProtectedRoute";
 import Layout from "./components/Layout";
 
 function App() {
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<Layout />}>
-                    <Route index element={<Home />} />
-                    <Route path="jobs/:id" element={<JobDetails />} />
-                    <Route path="login" element={<Login />} />
-                    <Route path="create-job" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
-                    <Route path="edit-job/:id" element={<ProtectedRoute><CreateJob /></ProtectedRoute>} />
-                    <Route path="*" element={<h2>404 Not Found</h2>} />
-                </Route>
-            </Routes>
-        </Router>
+        <AuthProvider>
+            <Router>
+                <Layout>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/jobs/:id" element={<JobDetails />} />
+                        <Route
+                            path="/create-job"
+                            element={
+                                <ProtectedRoute role="admin">
+                                    <CreateJob />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path="/edit-job/:id"
+                            element={
+                                <ProtectedRoute role="admin">
+                                    <EditJob />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route path="/login" element={<Login />} />
+                    </Routes>
+                </Layout>
+            </Router>
+        </AuthProvider>
     );
 }
 

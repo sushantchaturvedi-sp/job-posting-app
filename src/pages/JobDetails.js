@@ -1,19 +1,30 @@
-import { useParams } from "react-router-dom";
-import { getJobById } from "../utils/storage";
-import Navbar from "../components/Navbar";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 function JobDetails() {
     const { id } = useParams();
-    const job = getJobById(id);
+    const navigate = useNavigate();
+    const [job, setJob] = useState(null);
 
-    if (!job) return <h2>Job Not Found</h2>;
+    useEffect(() => {
+        const jobs = JSON.parse(sessionStorage.getItem("jobs")) || [];
+        const foundJob = jobs.find((j) => j.id === parseInt(id));
+        if (foundJob) {
+            setJob(foundJob);
+        } else {
+            alert("Job not found!");
+            navigate("/");
+        }
+    }, [id, navigate]);
+
+    if (!job) return <p>Loading...</p>;
 
     return (
-        <div><Navbar />
-            <div>
-                <h2>{job.title} at {job.company}</h2>
-                <p>{job.description}</p>
-            </div></div>
+        <div>
+            <h2>{job.title}</h2>
+            <h3>{job.company}</h3>
+            <p>{job.description}</p>
+        </div>
     );
 }
 
